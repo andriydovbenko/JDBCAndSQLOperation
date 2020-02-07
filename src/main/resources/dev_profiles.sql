@@ -2075,17 +2075,15 @@ HAVING COUNT(department) = (
 --task_5
 SELECT job_title, job_count, city, city_count
 FROM (
-         SELECT job_title, count(*) as job_count
+         SELECT id, job_title, count(*) as job_count
          FROM dev_profiles_db.public.profiles
          WHERE job_title = 'Executive Secretary'
-         GROUP BY job_title) as first
+         GROUP BY id) as first
          INNER JOIN (
-    SELECT city, count(*) as city_count
+    SELECT id, city, count(*) as city_count
     FROM dev_profiles_db.public.accounts
-    WHERE city = 'Rosmalen'
-    GROUP BY city) as second
-                    ON first = second;
-
+    GROUP BY id) as second
+                    ON first.id = second.id;
 
 --task_6
 SELECT *
