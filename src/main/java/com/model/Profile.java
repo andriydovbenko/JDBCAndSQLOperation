@@ -8,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-
 public class Profile implements Model {
     private @NonNull int ID;
     private @NonNull String USER_NAME;

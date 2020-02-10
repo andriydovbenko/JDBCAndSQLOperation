@@ -10,8 +10,6 @@ public class DbUtil {
     private static final String URL = "jdbc:postgresql://localhost:5432/dev_profiles_db";
     private static final String USERNAME = "postgres";
     private static final String PASSWORD = "1607";
-    private static final String DRIVER = "org.postgresql.Driver";
-
     private static final String ACCOUNTS_TABLE = "dev_profiles_db.public.accounts";
     private static final String PROFILES_TABLE = "dev_profiles_db.public.profiles";
     private static DbUtil INSTANCE;
@@ -36,28 +34,26 @@ public class DbUtil {
                     "(id, first_name, last_name, city, gender, username) VALUES(?,?,?,?,?,?)";
             String[] accountData = {((Account) model).getFIRST_NAME(), ((Account) model).getLAST_NAME(),
                     ((Account) model).getCITY(), ((Account) model).getGENDER(), ((Account) model).getUSER_NAME()};
-            int id = ((Account) model).getID();
-            tryToInsertIntoDB(id, accountData, SQL);
+            tryToInsertIntoDB(accountData, SQL);
         } else {
             String SQL = "INSERT INTO " + PROFILES_TABLE +
                     "(id, username, job_title, department, company, skill) VALUES(?,?,?,?,?,?)";
-            int id = ((Profile) model).getID();
             String[] profileData = {((Profile) model).getUSER_NAME(), ((Profile) model).getJOB_TITLE(),
                     ((Profile) model).getDEPARTMENT(), ((Profile) model).getCOMPANY(), ((Profile) model).getSKILL()};
-
-            tryToInsertIntoDB(id, profileData, SQL);
+            tryToInsertIntoDB(profileData, SQL);
         }
     }
 
-    private void tryToInsertIntoDB(int id, String[] data, String SQLCommand) {
+    private void tryToInsertIntoDB(String[] data, String SQLCommand) {
         try (Connection connection = connect()) {
+            int id = Integer.parseInt(data[0]);
             PreparedStatement preparedStatement = connection.prepareStatement(SQLCommand);
             preparedStatement.setInt(1, id);
             for (int x = 2; x < 7; x++) {
                 preparedStatement.setString(x, data[x - 2]);
             }
             preparedStatement.executeUpdate();
-        } catch (SQLException ex) {
+        } catch (SQLException | NumberFormatException ex) {
             System.out.println(ex.getMessage());
         }
     }
@@ -150,8 +146,20 @@ public class DbUtil {
     }
 
     public void updateModelInDB(Model model) {
-        removeModelFromDB(model);
-        insertModelIntoDB(model);
+        if (model instanceof Account) {
+            String SQL = "UPDATE id, first_name, last_name, city, gender, username FROM " + ACCOUNTS_TABLE +
+                    " WHERE id = ?";
+            String[] accountData = {((Account) model).getFIRST_NAME(), ((Account) model).getLAST_NAME(),
+                    ((Account) model).getCITY(), ((Account) model).getGENDER(), ((Account) model).getUSER_NAME()};
+            tryToInsertIntoDB(accountData, SQL);
+
+        } else {
+            String SQL = "UPDATE id, username, job_title, department, company, skill FROM " + PROFILES_TABLE +
+                    " WHERE id = ?";
+            String[] profileData = {((Profile) model).getUSER_NAME(), ((Profile) model).getJOB_TITLE(),
+                    ((Profile) model).getDEPARTMENT(), ((Profile) model).getCOMPANY(), ((Profile) model).getSKILL()};
+            tryToInsertIntoDB(profileData, SQL);
+        }
     }
 
     public void removeModelFromDB(Model model) {

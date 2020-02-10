@@ -10,9 +10,6 @@ create table accounts
     username   varchar(255)
 );
 
-alter table accounts
-    owner to postgres;
-
 INSERT INTO public.accounts (id, first_name, last_name, city, gender, username) VALUES (1, 'Mac', 'Ingon', 'Maksatikha', 'Male', 'mingon0');
 INSERT INTO public.accounts (id, first_name, last_name, city, gender, username) VALUES (2, 'Benedict', 'Dixsee', 'Kryva Hora', 'Male', 'bdixsee1');
 INSERT INTO public.accounts (id, first_name, last_name, city, gender, username) VALUES (3, 'Saxe', 'Coster', 'Karak', 'Male', 'scoster2');
@@ -1026,9 +1023,6 @@ create table profiles_table
     skill      varchar(255) not null
 );
 
-alter table profiles
-    owner to postgres;
-
 insert into profiles_table (id, username, job_title, department, company, skill) values (1, 'smacgeffen0', 'Editor', 'Support', 'Buzzdog', 'AV Integration');
 insert into profiles_table (id, username, job_title, department, company, skill) values (2, 'tdewicke1', 'Social Worker', 'Legal', 'Photobug', 'Email Marketing');
 insert into profiles_table (id, username, job_title, department, company, skill) values (3, 'bgallafant2', 'Web Designer IV', 'Sales', 'Yodo', 'Variable Data Printing');
@@ -2040,17 +2034,11 @@ WHERE department = 'Support'
 ORDER BY skill;
 
 --task_2
-CREATE TABLE temporary AS
-SELECT job_title, count(*) AS number
+
+SELECT job_title, count(*)
 FROM dev_profiles_db.public.profiles
-GROUP BY job_title;
-
-CREATE TABLE job_title_more_than_3 AS
-SELECT job_title, number
-FROM temporary
-WHERE number > 3;
-
-DROP TABLE temporary;
+GROUP BY job_title
+HAVING count(*)>3;;
 
 --task_3
 SELECT accounts.first_name, accounts.last_name, profiles.job_title, profiles.company
