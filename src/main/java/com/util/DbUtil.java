@@ -1,4 +1,4 @@
-package com.database;
+package com.util;
 
 import com.model.Account;
 import com.model.Model;
@@ -30,24 +30,35 @@ public class DbUtil {
 
     public void insertModelIntoDB(Model model) {
         if (model instanceof Account) {
-            String SQL = "INSERT INTO " + ACCOUNTS_TABLE +
-                    "(id, first_name, last_name, city, gender, username) VALUES(?,?,?,?,?,?)";
-            String[] accountData = {((Account) model).getFIRST_NAME(), ((Account) model).getLAST_NAME(),
-                    ((Account) model).getCITY(), ((Account) model).getGENDER(), ((Account) model).getUSER_NAME()};
-            tryToInsertIntoDB(accountData, SQL);
+            insertAccountIntoDB((Account) model);
         } else {
-            String SQL = "INSERT INTO " + PROFILES_TABLE +
-                    "(id, username, job_title, department, company, skill) VALUES(?,?,?,?,?,?)";
-            String[] profileData = {((Profile) model).getUSER_NAME(), ((Profile) model).getJOB_TITLE(),
-                    ((Profile) model).getDEPARTMENT(), ((Profile) model).getCOMPANY(), ((Profile) model).getSKILL()};
-            tryToInsertIntoDB(profileData, SQL);
+            insertProfileIntoDB((Profile) model);
         }
+    }
+
+    private void insertAccountIntoDB(Account model) {
+        String SQL = "INSERT INTO " + ACCOUNTS_TABLE +
+                "(id, first_name, last_name, city, gender, username) VALUES(?,?,?,?,?,?)";
+        String[] accountData = {model.getFIRST_NAME(), model.getLAST_NAME(),
+                model.getCITY(), model.getGENDER(), model.getUSER_NAME(),
+                String.valueOf(model.getID())};
+        tryToInsertIntoDB(accountData, SQL);
+    }
+
+    private void insertProfileIntoDB(Profile model) {
+        String SQL = "INSERT INTO " + PROFILES_TABLE +
+                "(id, username, job_title, department, company, skill) VALUES(?,?,?,?,?,?)";
+        String[] profileData = {model.getUSER_NAME(), model.getJOB_TITLE(),
+                model.getDEPARTMENT(), model.getCOMPANY(), model.getSKILL(),
+                String.valueOf(model.getID())};
+        tryToInsertIntoDB(profileData, SQL);
     }
 
     private void tryToInsertIntoDB(String[] data, String SQLCommand) {
         try (Connection connection = connect()) {
-            int id = Integer.parseInt(data[0]);
             PreparedStatement preparedStatement = connection.prepareStatement(SQLCommand);
+            int idPositionOnArray = 5;
+            int id = Integer.parseInt(data[idPositionOnArray]);
             preparedStatement.setInt(1, id);
             for (int x = 2; x < 7; x++) {
                 preparedStatement.setString(x, data[x - 2]);
@@ -87,7 +98,7 @@ public class DbUtil {
             String SQL = "SELECT id, first_name, last_name, city, gender, username FROM " + ACCOUNTS_TABLE +
                     " WHERE id = ?";
             ResultSet rs = getDataFromTheTable(numberOfRow, SQL);
-            model = tryToCreateAccountFromTableData(model, rs);
+            model = tryToCreateFromTableData(model, rs);
         } else {
             String SQL = "SELECT id, username, job_title, department, company, skill FROM " + PROFILES_TABLE +
                     " WHERE id = ?";
@@ -97,7 +108,7 @@ public class DbUtil {
         return model;
     }
 
-    private Model tryToCreateAccountFromTableData(Model model, ResultSet rs) {
+    private Model tryToCreateFromTableData(Model model, ResultSet rs) {
         try {
             model = createAccountFromTheTableData(rs);
         } catch (SQLException e) {
@@ -147,19 +158,38 @@ public class DbUtil {
 
     public void updateModelInDB(Model model) {
         if (model instanceof Account) {
-            String SQL = "UPDATE id, first_name, last_name, city, gender, username FROM " + ACCOUNTS_TABLE +
-                    " WHERE id = ?";
-            String[] accountData = {((Account) model).getFIRST_NAME(), ((Account) model).getLAST_NAME(),
-                    ((Account) model).getCITY(), ((Account) model).getGENDER(), ((Account) model).getUSER_NAME()};
-            tryToInsertIntoDB(accountData, SQL);
-
+            String SQL = getSQLForUpdatingAccount((Account) model);
+            int id = ((Account) model).getID();
+            tryToUpdateDB(SQL, id);
         } else {
-            String SQL = "UPDATE id, username, job_title, department, company, skill FROM " + PROFILES_TABLE +
-                    " WHERE id = ?";
-            String[] profileData = {((Profile) model).getUSER_NAME(), ((Profile) model).getJOB_TITLE(),
-                    ((Profile) model).getDEPARTMENT(), ((Profile) model).getCOMPANY(), ((Profile) model).getSKILL()};
-            tryToInsertIntoDB(profileData, SQL);
+            String SQL = getSQLForUpdatingProfile((Profile) model);
+            int id = ((Profile) model).getID();
+            tryToUpdateDB(SQL, id);
         }
+    }
+
+    private void tryToUpdateDB(String SQL, int id) {
+        try (Connection connection = connect()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+            preparedStatement.setInt(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException | NumberFormatException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    private String getSQLForUpdatingAccount(Account model) {
+        return "UPDATE " + ACCOUNTS_TABLE +
+                " SET first_name ='" + model.getFIRST_NAME() + "', last_name ='" + model.getLAST_NAME() +
+                "', city = '" + model.getCITY() + "', gender=  '" + model.getGENDER() + "'," +
+                " username = '" + model.getUSER_NAME() + "'  WHERE id = ?";
+    }
+
+    private String getSQLForUpdatingProfile(Profile model) {
+        return "UPDATE " + PROFILES_TABLE +
+                "  SET  username = '" + model.getUSER_NAME() + "', job_title = '" + model.getJOB_TITLE() +
+                "', department= '" + model.getDEPARTMENT() + "', company= '" + model.getCOMPANY() + "', skill = '" +
+                model.getSKILL() + "' WHERE id = ?";
     }
 
     public void removeModelFromDB(Model model) {

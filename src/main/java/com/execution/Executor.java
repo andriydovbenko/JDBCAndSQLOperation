@@ -1,19 +1,20 @@
 package com.execution;
 
-import com.database.DbUtil;
+import com.util.DbUtil;
 import com.model.Account;
 import com.model.Profile;
 
 public class Executor {
-    private Account accounts = new Account();
-    private Profile profiles = new Profile();
+    private static final int ROW_NUMBER = 500;
+    private final Account accounts = new Account();
+    private final Profile profiles = new Profile();
+    private final DbUtil dbUtil = DbUtil.getINSTANCE();
     private Account petroAccount;
     private Profile petroProfile;
     private Account vasilAccount;
     private Profile vasilProfile;
     private Profile profileFromTable;
     private Account accountFromTable;
-    private DbUtil dbUtil = DbUtil.getINSTANCE();
 
     public void startProcessing() {
         createPetroAccountAndProfile();
@@ -26,7 +27,8 @@ public class Executor {
 
         removeAccountAndProfile(vasilAccount, vasilProfile);
         printAccountsAndProfiles();
-        getAccountAndProfileFromTables(500);
+
+        getAccountAndProfileFromTables(ROW_NUMBER);
         tryToPrintAccountAndProfileInformation(accountFromTable, profileFromTable);
     }
 
