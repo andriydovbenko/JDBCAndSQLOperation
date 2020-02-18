@@ -34,8 +34,7 @@ public class Executor {
 
     private void printAccountAndProfileInformation(Account account, Profile profile) {
         if (account != null && profile != null) {
-            System.out.println(accountFromTable.toString());
-            System.out.println(profileFromTable.toString());
+            System.out.println(accountFromTable.toString() + "\n" + profileFromTable.toString());
         } else {
             System.out.println("There no such a rows inside tables");
         }
