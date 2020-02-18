@@ -6,8 +6,8 @@ import com.model.Profile;
 
 public class Executor {
     private static final int ROW_NUMBER = 500;
-    private final Account accounts = new Account();
-    private final Profile profiles = new Profile();
+    private final Account account = new Account();
+    private final Profile profile = new Profile();
     private final DbUtil dbUtil = DbUtil.getINSTANCE();
     private Account petroAccount;
     private Profile petroProfile;
@@ -29,10 +29,10 @@ public class Executor {
         printAccountsAndProfiles();
 
         getAccountAndProfileFromTables(ROW_NUMBER);
-        tryToPrintAccountAndProfileInformation(accountFromTable, profileFromTable);
+        printAccountAndProfileInformation(accountFromTable, profileFromTable);
     }
 
-    private void tryToPrintAccountAndProfileInformation(Account account, Profile profile) {
+    private void printAccountAndProfileInformation(Account account, Profile profile) {
         if (account != null && profile != null) {
             System.out.println(accountFromTable.toString());
             System.out.println(profileFromTable.toString());
@@ -42,8 +42,8 @@ public class Executor {
     }
 
     private void getAccountAndProfileFromTables(int rowNumber) {
-        accountFromTable = (Account) dbUtil.selectDataFromTable(rowNumber, accounts);
-        profileFromTable = (Profile) dbUtil.selectDataFromTable(rowNumber, profiles);
+        accountFromTable = (Account) dbUtil.selectDataFromTable(rowNumber, account);
+        profileFromTable = (Profile) dbUtil.selectDataFromTable(rowNumber, profile);
     }
 
     private void updateAccountAndProfileById(Account account, Profile profile) {
@@ -57,8 +57,8 @@ public class Executor {
     }
 
     private void printAccountsAndProfiles() {
-        dbUtil.printTableIntoConsole(accounts);
-        dbUtil.printTableIntoConsole(profiles);
+        dbUtil.printTableIntoConsole(account);
+        dbUtil.printTableIntoConsole(profile);
     }
 
     private void insertAccountAndProfileIntoTable(Account account, Profile profile) {
