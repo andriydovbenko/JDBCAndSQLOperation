@@ -7,7 +7,7 @@
     <description>Simple SQL and JDBC educational project</description>
 
     <groupId>com.cursor</groupId>
-    <artifactId>JDBCAndSQLOperation</artifactId>
+    <artifactId>jdbc-and-sql-operarion</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
