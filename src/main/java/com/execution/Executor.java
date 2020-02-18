@@ -28,7 +28,7 @@ public class Executor {
         removeAccountAndProfile(vasilAccount, vasilProfile);
         printAccountsAndProfiles();
 
-        getAccountAndProfileFromTables(ROW_NUMBER);
+        getAccountAndProfileFromTables();
         printAccountAndProfileInformation(accountFromTable, profileFromTable);
     }
 
@@ -41,9 +41,9 @@ public class Executor {
         }
     }
 
-    private void getAccountAndProfileFromTables(int rowNumber) {
-        accountFromTable = (Account) dbUtil.selectDataFromTable(rowNumber, account);
-        profileFromTable = (Profile) dbUtil.selectDataFromTable(rowNumber, profile);
+    private void getAccountAndProfileFromTables() {
+        accountFromTable = (Account) dbUtil.selectDataFromTable(ROW_NUMBER, account);
+        profileFromTable = (Profile) dbUtil.selectDataFromTable(ROW_NUMBER, profile);
     }
 
     private void updateAccountAndProfileById(Account account, Profile profile) {
