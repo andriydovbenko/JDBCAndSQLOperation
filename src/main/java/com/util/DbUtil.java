@@ -24,7 +24,7 @@ public class DbUtil {
         return INSTANCE;
     }
 
-    private Connection connect() throws SQLException {
+    private Connection establishConnection() throws SQLException {
         return DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
 
@@ -42,7 +42,7 @@ public class DbUtil {
         String[] accountData = {model.getFIRST_NAME(), model.getLAST_NAME(),
                 model.getCITY(), model.getGENDER(), model.getUSER_NAME(),
                 String.valueOf(model.getID())};
-        tryToInsertIntoDB(accountData, SQL);
+        insertIntoDB(accountData, SQL);
     }
 
     private void insertProfileIntoDB(Profile model) {
@@ -51,11 +51,11 @@ public class DbUtil {
         String[] profileData = {model.getUSER_NAME(), model.getJOB_TITLE(),
                 model.getDEPARTMENT(), model.getCOMPANY(), model.getSKILL(),
                 String.valueOf(model.getID())};
-        tryToInsertIntoDB(profileData, SQL);
+        insertIntoDB(profileData, SQL);
     }
 
-    private void tryToInsertIntoDB(String[] data, String SQLCommand) {
-        try (Connection connection = connect()) {
+    private void insertIntoDB(String[] data, String SQLCommand) {
+        try (Connection connection = establishConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(SQLCommand);
             int idPositionOnArray = 5;
             int id = Integer.parseInt(data[idPositionOnArray]);
@@ -72,15 +72,15 @@ public class DbUtil {
     public void printTableIntoConsole(Model model) {
         if (model instanceof Account) {
             String SQL = "SELECT * FROM " + ACCOUNTS_TABLE;
-            tryToCreateConnectionAndPrintTable(SQL);
+            createConnectionAndPrintTable(SQL);
         } else {
             String SQL = "SELECT * FROM " + PROFILES_TABLE;
-            tryToCreateConnectionAndPrintTable(SQL);
+            createConnectionAndPrintTable(SQL);
         }
     }
 
-    private void tryToCreateConnectionAndPrintTable(String SQLCommand) {
-        try (Connection connection = connect()) {
+    private void createConnectionAndPrintTable(String SQLCommand) {
+        try (Connection connection = establishConnection()) {
             PreparedStatement statement = connection.prepareStatement(SQLCommand);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -98,17 +98,17 @@ public class DbUtil {
             String SQL = "SELECT id, first_name, last_name, city, gender, username FROM " + ACCOUNTS_TABLE +
                     " WHERE id = ?";
             ResultSet rs = getDataFromTheTable(numberOfRow, SQL);
-            model = tryToCreateFromTableData(model, rs);
+            model = createFromTableData(model, rs);
         } else {
             String SQL = "SELECT id, username, job_title, department, company, skill FROM " + PROFILES_TABLE +
                     " WHERE id = ?";
             ResultSet rs = getDataFromTheTable(numberOfRow, SQL);
-            model = tryToCreateProfileFromTableData(model, rs);
+            model = createProfileFromTableData(model, rs);
         }
         return model;
     }
 
-    private Model tryToCreateFromTableData(Model model, ResultSet rs) {
+    private Model createFromTableData(Model model, ResultSet rs) {
         try {
             model = createAccountFromTheTableData(rs);
         } catch (SQLException e) {
@@ -117,7 +117,7 @@ public class DbUtil {
         return model;
     }
 
-    private Model tryToCreateProfileFromTableData(Model model, ResultSet rs) {
+    private Model createProfileFromTableData(Model model, ResultSet rs) {
         try {
             model = createProfileFromTheTableData(rs);
         } catch (SQLException e) {
@@ -128,7 +128,7 @@ public class DbUtil {
 
     private ResultSet getDataFromTheTable(int numberOfRow, String SQLCommand) {
         ResultSet rs = null;
-        try (Connection connection = connect()) {
+        try (Connection connection = establishConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(SQLCommand);
             preparedStatement.setInt(1, numberOfRow);
             rs = preparedStatement.executeQuery();
@@ -160,16 +160,16 @@ public class DbUtil {
         if (model instanceof Account) {
             String SQL = getSQLForUpdatingAccount((Account) model);
             int id = ((Account) model).getID();
-            tryToUpdateDB(SQL, id);
+            updateDB(SQL, id);
         } else {
             String SQL = getSQLForUpdatingProfile((Profile) model);
             int id = ((Profile) model).getID();
-            tryToUpdateDB(SQL, id);
+            updateDB(SQL, id);
         }
     }
 
-    private void tryToUpdateDB(String SQL, int id) {
-        try (Connection connection = connect()) {
+    private void updateDB(String SQL, int id) {
+        try (Connection connection = establishConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(SQL);
             preparedStatement.setInt(1, id);
             preparedStatement.executeUpdate();
@@ -196,16 +196,16 @@ public class DbUtil {
         if (model instanceof Account) {
             String SQL = "DELETE FROM " + ACCOUNTS_TABLE + " WHERE id = ?";
             int id = ((Account) model).getID();
-            tryToRemoveFromTableById(SQL, id);
+            removeFromTableById(SQL, id);
         } else {
             String SQL = "DELETE FROM " + PROFILES_TABLE + " WHERE id = ?";
             int id = ((Profile) model).getID();
-            tryToRemoveFromTableById(SQL, id);
+            removeFromTableById(SQL, id);
         }
     }
 
-    private void tryToRemoveFromTableById(String SQL, int id) {
-        try (Connection connection = connect()) {
+    private void removeFromTableById(String SQL, int id) {
+        try (Connection connection = establishConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(SQL);
             preparedStatement.setInt(1, id);
             preparedStatement.executeUpdate();
